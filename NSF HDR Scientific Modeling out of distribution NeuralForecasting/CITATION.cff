@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: >-
+  AMAG: Adaptive Multi-scale Attention Graph for Neural
+  Time-Series Forecasting
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Joe
+    family-names: Liao
+    affiliation: National Central University (NCU)
+repository-code: >-
+  https://github.com/0857boy/NSF-HDR-NeuralForecasting/NSF-HDR-Scientific-Modeling-out-of-distribution-NeuralForecasting
+license: MIT
+date-released: "2025-02-25"
+keywords:
+  - neural-forecasting
+  - time-series
+  - out-of-distribution
+  - graph-neural-network
+  - attention
+abstract: >-
+  AMAG (Adaptive Multi-scale Attention Graph) is a neural
+  time-series forecasting model submitted to the NSF HDR
+  Scientific Mood (Modeling out of Distribution) Challenge.
+  It combines Reversible Instance Normalization (RevIN),
+  multi-scale temporal attention, and adaptive graph
+  convolution for robust out-of-distribution prediction.
