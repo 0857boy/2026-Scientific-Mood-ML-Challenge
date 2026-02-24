@@ -1,6 +1,6 @@
 # NSF HDR Scientific Mood Challenge — NeuralForecasting
 
-This repository contains training code and submissions for the [NSF HDR Scientific Mood (Modeling out of Distribution) Challenge: NeuralForecasting Track](https://www.codabench.org/competitions/9854/).
+This repository contains training code and submissions for the [NSF HDR Scientific Mood (Modeling out of Distribution) Challenge: NeuralForecasting Track](https://www.codabench.org/competitions/9806/). The full source code is available at [GitHub](https://github.com/0857boy/2026-Scientific-Mood-ML-Challenge/tree/main/NSF%20HDR%20Scientific%20Modeling%20out%20of%20distribution%20NeuralForecasting).
 
 **Model:** AMAG (Adaptive Multi-scale Attention Graph)  
 **Author:** Joe Liao, National Central University (NCU)
@@ -110,7 +110,20 @@ The model takes input of shape `(B, 20, N, F)` where:
 
 ## References
 
+### General Time-Series Forecasting
+
+- Liu, Y., et al. "iTransformer: Inverted Transformers are Effective for Time Series Forecasting." *ICLR 2024*.
 - Kim, T., et al. "Reversible Instance Normalization for Accurate Time-Series Forecasting against Distribution Shift." *ICLR 2022*.
+
+### Neuroscience & Neural Activity Prediction
+
+- Li, J., et al. "AMAG: Additive, Multiplicative and Adaptive Graph Neural Network For Forecasting Neural Activity." *NeurIPS 2023*.
+- Asadi, M., et al. "BACE: Behavior-Adaptive Connectivity Estimation for Interpretable Graphs of Neural Dynamics." *bioRxiv 2025*.
+- Duan, Y., et al. "POCO: Scalable Neural Forecasting through Population Conditioning." *arXiv 2025*.
+
+### Anomaly Detection in Science
+
+- Campolongo, E. G., et al. "Building Machine Learning Challenges for Anomaly Detection in Science." *2025*.
 
 ## License
 
