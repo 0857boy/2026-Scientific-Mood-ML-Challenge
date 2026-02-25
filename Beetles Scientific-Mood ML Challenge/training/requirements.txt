@@ -1,0 +1,17 @@
+# --- PyTorch 生態系 ---
+torch>=2.0.0
+torchvision>=0.15.0
+
+# --- Hugging Face 生態系 (資料庫與模型) ---
+datasets>=2.14.0
+open_clip_torch>=2.20.0
+timm>=0.9.0
+
+# --- 機器學習與數學計算 ---
+numpy>=1.22.4
+scikit-learn>=1.2.0
+pandas>=2.0.0
+
+# --- 影像處理與工具 ---
+Pillow>=9.0.0
+tqdm>=4.66.0
