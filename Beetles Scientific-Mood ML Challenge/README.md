@@ -27,8 +27,8 @@ We utilized two distinct visual backbones, both combined with a custom regressio
 | Parameter | BioClip-2 Model | ConvNeXt Base Model |
 | :--- | :--- | :--- |
 | **Backbone** | `hf-hub:imageomics/bioclip-2` | `convnext_base.fb_in22k_ft_in1k` |
-| **Input Image Size** | 224x224 | 224x224 |
-| **Batch Size** | 32 | 64 |
+| **Input Image Size** | **224, 336, 448 (Ensembled)** | 224x224 |
+| **Batch Size** | 32 (scales with image size) | 64 |
 | **Epochs** | 50 | 50 |
 | **Optimizer** | AdamW (Weight Decay: $10^{-3}$) | AdamW (Weight Decay: $10^{-3}$) |
 | **Learning Rate** | **Dual LR**: $10^{-5}$ (Backbone) / $10^{-4}$ (Head) | $10^{-5}$ (Global) |
@@ -36,7 +36,7 @@ We utilized two distinct visual backbones, both combined with a custom regressio
 | **Cross-Validation**| 5-Fold | 5-Fold |
 
 ### 2. Key Training Innovations
-* **Extreme-Value Weighted Loss:** Instead of a standard MSE, we implemented a custom weighted loss function: `Loss = (MSE * (1.0 + |target|)).mean()`. This forces the model to pay more attention to extreme drought or wet conditions (high absolute SPEI values), which significantly improved our $R^2$ score.
+* **Multi-Resolution Ensemble Strategy (BioClip):** To capture features at different scales, we trained the BioClip backbone across three different image resolutions: 224, 336, and 448. During the final JIT ensemble inference, we uniformized the input size to 448x448. To support this cross-resolution inference without breaking the Vision Transformer, we implemented a dynamic positional embedding interpolation function (`_resize_pos_embed`).
 * **Layer Unfreezing Strategy (BioClip):** To prevent catastrophic forgetting of the pre-trained biological features in BioClip, we froze the entire visual transformer and only unfreezed the last 2 ResBlocks (`n_last_trainable_resblocks=2`) alongside the newly initialized regression head.
 * **Dual Learning Rate (BioClip):** We applied a smaller learning rate ($10^{-5}$) to the unfreezed BioClip backbone to preserve its representations, while using a larger learning rate ($10^{-4}$) for the randomly initialized regression head to accelerate convergence.
 
@@ -46,6 +46,7 @@ We utilized two distinct visual backbones, both combined with a custom regressio
 
 The project is mainly divided into two core directories: `training/` and `submissions/`.
 
-### 1. `training/` (Training Module)
+### `training/` (Training Module)
 This directory contains all the scripts required to train the models from scratch.
-* `train_bioclip.py`: Training script for fine
+* `train_bioclip.py`
+* `train_convnext.py`
