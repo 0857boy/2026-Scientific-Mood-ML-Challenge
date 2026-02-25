@@ -140,7 +140,11 @@ def train_fold(fold, train_hf, val_hf, s_map, d_map):
             out = model(img, s, d)
             
             # 使用我們測試出能提升 R2 的加權 Loss
-            raw_loss = criterion(out[:, :3], t)
+            mu = out[:, :3]
+            log_var = out[:, 3:]
+            log_var = torch.clamp(log_var, min=-5.0, max=5.0)
+            precision = torch.exp(-log_var)
+            raw_loss = 0.5 * precision * (mu - t)**2 + 0.5 * log_var
             weight = 1.0 + torch.abs(t) 
             loss = (raw_loss * weight).mean()
             
