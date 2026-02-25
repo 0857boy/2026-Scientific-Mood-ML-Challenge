@@ -80,9 +80,16 @@ python baselines/training/AMAG/evaluation.py --monkey beignet
 | Item | Detail |
 |---|---|
 | **Model** | Hybrid Regressor (BioClip-2 ViT-B/16 + ConvNeXt Base) |
+| **Regression Head** | Hidden Size: 512 → 256 → 6 with categorical metadata embeddings |
 | **Target** | SPEI at 30-day, 1-year, and 2-year scales |
 | **Input Features** | Beetle satellite images, scientific names, Domain IDs |
+| **Training** | 5-Fold CV · 50 epochs · AdamW + Cosine Annealing LR |
 | **Data & Weights** | [🤗 Hugging Face: jason79461385/beetles](https://huggingface.co/jason79461385/beetles) |
+
+**Key Training Innovations:**
+- **Extreme-Value Weighted Loss** — `(MSE × (1 + |target|)).mean()` to emphasize extreme drought/wet conditions
+- **Layer Unfreezing** (BioClip) — Only last 2 ResBlocks unfrozen to prevent catastrophic forgetting
+- **Dual Learning Rate** (BioClip) — 10⁻⁵ for backbone / 10⁻⁴ for regression head
 
 ### Quick Start
 
