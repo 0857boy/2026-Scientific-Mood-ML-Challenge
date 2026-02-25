@@ -1,37 +1,63 @@
-# Coastal Flood Prediction - XGBoost Regression Approach
+# Predicting Coastal Flooding Events - Scientific Out-of-Distribution Challenge
 
-## 🌊 Overview
-This submission adopts a **Regression** approach to solve the coastal flood prediction problem. Unlike traditional binary classification models (0 or 1), this XGBoost model predicts the specific continuous "margin" (how much the maximum sea level will exceed the threshold) over the next 14 days. By using an optimal offset discovered during validation, this margin is converted into a final flood probability. This method better preserves the continuous physical characteristics of water levels.
+This repository contains sample training code and submissions for the Coastal Flooding Events challenge. It is designed to give participants a reference for working on the challenge, including generating training data, training the model, and running local evaluations.
 
-## 🛠️ Feature Engineering
-The input uses a time series window of 168 hours, extracting 14 core features for each time step:
+## Repository Structure
 
-1. **Base Normalized Features**: `sea_level` and `threshold`.
-2. **Physical/Cyclical Features (Crucial)**:
-   - **Solar Day (24h)**: `sin`, `cos`
-   - **Lunar Day / Tide (12.42h)**: `sin`, `cos` (Effectively helps the model understand tidal rise and fall patterns)
-   - **Seasonality (366d)**: `sin`, `cos`
-3. **Statistical Features**:
-   - `diff`: First-order difference of the sequence
-   - `rolling_mean`: Moving average
-   - `rolling_std`: Moving standard deviation
-   - `dist`: Distance between current sea level and the threshold
-4. **Lag Features**: 
-   - Sea level 24 hours ago (`lag_24`) and 25 hours ago (`lag_25`).
-
-## 🧠 Model Mechanism
-1. **Model**: `XGBRegressor` (trained using the `reg:squarederror` objective function).
-2. **Inference**: The model outputs a continuous `Margin` value (Predicted Sea Level - Threshold).
-3. **Probability Mapping**: It reads the pre-calculated optimal offset. If the predicted margin is greater than the offset, it indicates a high risk of flooding. A custom Sigmoid function `1 / (1 + exp(-k * (margin - offset)))` is applied to smoothly map this value to a 0~1 probability range.
-
-## 📂 File Structure
-* `model.py`: The main inference script for the test set, containing feature extraction, model loading, and batch inference logic.
-* `xgb_reg_model.json`: The trained XGBoost regression model weights.
-* `best_offset.txt`: A text file storing the optimal decision offset (e.g., `-0.10000000000000009`). It must be placed in the same directory as the script during inference.
-* `requirements.txt`: The list of Python dependencies required to run the environment.
-
-## 🚀 How to Run
-
-Please ensure all dependencies are installed:
+Predicting Coastal Flooding Events - Scientific Out-of-Distribution Challenge/
+│   ├── submissions/
+│   │   └── xgboost_regression/
+│   │       ├── best_offset.txt
+│   │       ├── model.py
+│   │       ├── xgb_reg_model.json
+│   │       └── requirements.txt
+│   └── training/
+│       └── xgboost_regression/
+│           ├── convert_to_parquet.py
+│           ├── train_xgb_regression.py
+│           ├── NEUSTG_19502020_12stations.mat
+│           ├── Seed_Coastal_Stations_Thresholds.mat
+│           ├── Seed_Coastal_Stations.txt
+│           ├── Seed_Historical_Time_Intervals.txt
+│           └── requirements.txt
+└── README.md
+└── LICENSE
+## Installation & Running (for Training)
+### Installation
+To run this code, first create a fresh environment, then install the requirements file:
 ```bash
-pip install -r requirements.txt
+pip install -r training/xgboost_regression/requirements.txt
+```
+(Note: The environment requires packages such as `numpy`, `pandas`, `xgboost`, `scipy`, and `scikit-learn`.)
+
+### Step 1: Generating Training Data
+The raw historical data is provided in `.mat` and `.txt` formats. Before training, you need to convert these into a standardized `hourly_data.parquet` file.
+
+Navigate to the training directory and run the conversion script:
+```bash
+cd training/xgboost_regression/
+python convert_to_parquet.py
+```
+This script will parse `NEUSTG_19502020_12stations.mat`, `Seed_Coastal_Stations.txt`, and `Seed_Coastal_Stations_Thresholds.mat` to generate the consolidated Parquet file required for training.
+
+### Step 2: Training
+An example training run can be executed by running the following:
+```bash
+python train_xgb_regression.py
+```
+This script reads `hourly_data.parquet`, standardizes the sea level and threshold data, and trains an `XGBRegressor` using a 168-hour input window.
+
+Upon completion, it will output two crucial files needed for your submission:
+1. `xgb_reg_model.json`: The trained model weights.
+2. `best_offset.txt`: The optimal margin offset calculated to maximize the MCC metric.
+
+
+### Step 3: Evaluation
+After training, you can locally evaluate your model by running the following:
+
+First, ensure `xgb_reg_model.json` and `best_offset.txt` are copied into the `submissions/xgboost_regression/` directory. Then, execute the inference script:
+```bash
+cd ../../submissions/xgboost_regression/
+python model.py --test_hourly <path_to_test_hourly.csv> --test_index <path_to_test_index.csv> --predictions_out submission.csv
+```
+The `model.py` script will load the XGBoost model, apply the `best_offset.txt` to the predicted margins, and convert them into final flood probabilities.
