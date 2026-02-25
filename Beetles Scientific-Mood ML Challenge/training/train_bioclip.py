@@ -19,7 +19,7 @@ from PIL import Image
 CONFIG = {
     'dataset_path': './sentinel_beetles_local',
     'save_dir': './weights_bioclip_golden',
-    'img_size': 224,                  # 依照您的需求改為 224, 336, 或 448
+    'img_size': 224,                  # change to 224, 336, or 448
     'batch_size': 32,                 # 224: 32 | 336: 16 | 448: 8
     'epochs': 15,                     
     'lr_head': 1e-4,                
@@ -183,7 +183,11 @@ def train_fold(fold, train_hf, val_hf, s_map, d_map):
             out = model(img, s, d)
             
             # 3. [高分關鍵] 極端值加權 Loss
-            raw_loss = criterion(out[:, :3], t)
+            mu = out[:, :3]
+            log_var = out[:, 3:]
+            log_var = torch.clamp(log_var, min=-5.0, max=5.0)
+            precision = torch.exp(-log_var)
+            raw_loss = 0.5 * precision * (mu - t)**2 + 0.5 * log_var
             weight = 1.0 + torch.abs(t) 
             loss = (raw_loss * weight).mean()
             
