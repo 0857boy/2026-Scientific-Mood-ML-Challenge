@@ -17,31 +17,35 @@ Before running any training or inference scripts, you **must** download the requ
 
 ---
 
+## ⚙️ Training Configurations & Innovations
+
+To achieve robust performance, we trained two separate architectures and incorporated several key training strategies:
+
+### 1. Model Architectures & Hyperparameters
+We utilized two distinct visual backbones, both combined with a custom regression head (Hidden Size: $512 \rightarrow 256 \rightarrow 6$) that embeds categorical metadata (Species and Domain IDs).
+
+| Parameter | BioClip-2 Model | ConvNeXt Base Model |
+| :--- | :--- | :--- |
+| **Backbone** | `hf-hub:imageomics/bioclip-2` | `convnext_base.fb_in22k_ft_in1k` |
+| **Input Image Size** | 224x224 | 224x224 |
+| **Batch Size** | 32 | 64 |
+| **Epochs** | 50 | 50 |
+| **Optimizer** | AdamW (Weight Decay: $10^{-3}$) | AdamW (Weight Decay: $10^{-3}$) |
+| **Learning Rate** | **Dual LR**: $10^{-5}$ (Backbone) / $10^{-4}$ (Head) | $10^{-5}$ (Global) |
+| **Scheduler** | Cosine Annealing LR | Cosine Annealing LR |
+| **Cross-Validation**| 5-Fold | 5-Fold |
+
+### 2. Key Training Innovations
+* **Extreme-Value Weighted Loss:** Instead of a standard MSE, we implemented a custom weighted loss function: `Loss = (MSE * (1.0 + |target|)).mean()`. This forces the model to pay more attention to extreme drought or wet conditions (high absolute SPEI values), which significantly improved our $R^2$ score.
+* **Layer Unfreezing Strategy (BioClip):** To prevent catastrophic forgetting of the pre-trained biological features in BioClip, we froze the entire visual transformer and only unfreezed the last 2 ResBlocks (`n_last_trainable_resblocks=2`) alongside the newly initialized regression head.
+* **Dual Learning Rate (BioClip):** We applied a smaller learning rate ($10^{-5}$) to the unfreezed BioClip backbone to preserve its representations, while using a larger learning rate ($10^{-4}$) for the randomly initialized regression head to accelerate convergence.
+
+---
+
 ## 📂 Project Structure
 
 The project is mainly divided into two core directories: `training/` and `submissions/`.
 
 ### 1. `training/` (Training Module)
 This directory contains all the scripts required to train the models from scratch.
-* `train_bioclip.py`: Training script for fine-tuning the [Imageomics BioClip-2](https://huggingface.co/imageomics/bioclip-2) (ViT-B/16) model. It includes 5-Fold Cross-Validation and an extreme-weather weighted Loss function.
-* `train_convnext.py`: Training script utilizing the ConvNeXt Base model.
-* `utils.py`: Shared utility functions (e.g., data preprocessing, metrics calculation, debugging tools).
-* `mappings.json`: Dictionary mapping Species (scientific names) and Domain IDs to numerical integer IDs.
-* `requirements.txt`: Python dependencies required for training.
-
-### 2. `submissions/` (Inference & Submission Module)
-This directory contains the code to be zipped and uploaded to the official evaluation system.
-* `model.py`: The core inference script. It contains the `Model` class responsible for loading weights, preprocessing, and making predictions. This script is heavily optimized to meet the evaluation system's strict memory limits and output formatting requirements (Scalar Aggregation).
-* `mappings.json`: Required ID mapping dictionary for inference.
-* `requirements.txt`: Python dependencies required by the evaluation environment (e.g., `timm`, `open_clip_torch`, `pandas`).
-
----
-
-## 🚀 Quick Start
-
-### Model Training
-1. Ensure you have downloaded the dataset from the Hugging Face repository to your local machine.
-2. Navigate to the training directory and install dependencies:
-   ```bash
-   cd training
-   pip install -r requirements.txt
+* `train_bioclip.py`: Training script for fine
