@@ -3,16 +3,16 @@
 This repository contains sample training code and submissions for the Coastal Flooding Events challenge. It is designed to give participants a reference for working on the challenge, including generating training data, training the model, and running local evaluations.
 
 ## Repository Structure
-
+```
 Predicting Coastal Flooding Events - Scientific Out-of-Distribution Challenge/
-│   ├── submissions/
-│   │   └── xgboost_regression/
-│   │       ├── best_offset.txt
-│   │       ├── model.py
-│   │       ├── xgb_reg_model.json
-│   │       └── requirements.txt
-│   └── training/
-│       └── xgboost_regression/
+│  ├── submissions/
+│  │   └── xgboost_regression/
+│  │       ├── best_offset.txt
+│  │       ├── model.py
+│  │       ├── xgb_reg_model.json
+│  │       └── requirements.txt
+│  └── training/
+│      └── xgboost_regression/
 │           ├── convert_to_parquet.py
 │           ├── train_xgb_regression.py
 │           ├── NEUSTG_19502020_12stations.mat
@@ -22,6 +22,7 @@ Predicting Coastal Flooding Events - Scientific Out-of-Distribution Challenge/
 │           └── requirements.txt
 └── README.md
 └── LICENSE
+```
 ## Installation & Running (for Training)
 ### Installation
 To run this code, first create a fresh environment, then install the requirements file:
